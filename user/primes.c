@@ -12,9 +12,9 @@ int main(int argc, char *argv)
 	int rightp = 0;
 	for (i = 2; i <= 35; i++)
 	{
-		if(countright == 0)
+		if(countright == 0)//第一层向此后多层传输2至35
 		{
-                        pipe(p);
+            pipe(p);
 			if (fork() == 0)
 			{
 				close(p[1]);
@@ -36,15 +36,15 @@ int main(int argc, char *argv)
 		{
 			if (read(leftp, &i, sizeof(int)) != 0)
 			{
-				if (countleft == 0)
+				if (countleft == 0)//第一次创建的层将传过来的第一个数作为该层筛选所用质数
 				{
 					prime = i;
 					printf("prime %d \n", i);
 					countleft = 1;
 				}
-				if (i % prime != 0)
+				if (i % prime != 0)//当出现不可被质数整除时
 				{
-					if (countright == 0)
+					if (countright == 0)//如果第一次创建后续层，将建立新的管道
 					{
 						pipe(p);
 						if (fork() == 0)
@@ -66,7 +66,7 @@ int main(int argc, char *argv)
 			}
 			else
 			{
-				if (countright != 0)
+				if (countright != 0)//如果创建了后续层，则需要将它的右侧端口关闭
 				{
 					close(rightp);
 					break;
@@ -78,10 +78,10 @@ int main(int argc, char *argv)
 			}
 		}
 	}
-	else
+	else//第一层的右侧端口关闭
 	{
 		close(rightp);
 	}
-	wait(0);
+	wait(0);//等待子进程
 	exit(0);
 }

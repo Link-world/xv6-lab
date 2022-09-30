@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 3) 
     {
-        printf("Not standard input!1\n");
+        printf("Not standard input!\n");
     }
     else 
     {
@@ -39,18 +39,13 @@ void find(char *dir, char *fnm)
 	switch(st.type)
 	{
 	case T_FILE:
-		printf("Not standard input");
+		printf("Not standard input");//说明传入的目录不为文件夹时不符合规定
 		break;
 	case T_DIR:
-		if(strlen(dir) + 1 + DIRSIZ + 1 > sizeof path)
-		{
-      		printf("find: path too long\n");
-      		break;
-    	}
 		strcpy(path, dir);
 		p = path + strlen(path);
 		*p++ = '/';
-        while(read(fd, &de, sizeof(de)) == sizeof(de)) 
+        while(read(fd, &de, sizeof(de)) == sizeof(de))//遍历文件夹的内容
         {
             memmove(p, de.name, DIRSIZ);
       		p[DIRSIZ] = 0;
