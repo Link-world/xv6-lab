@@ -50,7 +50,7 @@ int split(char *line, char buf[MAXARG][MAXLEN])
     {
         if(state == 1)//正常读取状态
         {
-            if(line[i] == ' ' || line[i] == '\n')
+            if(line[i] == ' ' || line[i] == '\n' || line[i] == '\r')
             {
                 buf[j++][k] = '\0';
                 k = 0;
@@ -63,7 +63,7 @@ int split(char *line, char buf[MAXARG][MAXLEN])
         }
         else//空格状态
         {
-            if(line[i] != ' ')
+            if(line[i] != ' ' && line[i] != '\n' && line[i] != '\r')
             {
                 buf[j][k++] = line[i];
                 state = 1;
