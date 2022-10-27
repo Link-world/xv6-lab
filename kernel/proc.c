@@ -152,6 +152,39 @@ freeproc(struct proc *p)
   p->state = UNUSED;
 }
 
+//Calculate the number of unused processes
+uint64 
+calc_proc(void)
+{
+  struct proc *p;
+  uint64 ProcNum = 0;
+  for(p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+    if(p->state == UNUSED) {
+      ProcNum++;
+    } 
+    release(&p->lock);
+  }
+  return ProcNum;
+}
+
+//Calculate the number of free file descriptors
+uint64
+calc_fd(void)
+{
+  struct proc *p = myproc();
+  struct file **f;
+  uint64 FdNum = 0;
+  acquire(&p->lock);
+  for(f = p->ofile; f < &(p->ofile[NOFILE]); f++) {
+    if (*f == 0) {
+      FdNum++;
+    }
+  }
+  release(&p->lock);
+  return FdNum;
+}
+
 // Create a user page table for a given process,
 // with no user memory, but with trampoline pages.
 pagetable_t
@@ -279,6 +312,9 @@ fork(void)
 
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
+
+  //copy mask.
+  np->mask = p->mask;
 
   // Cause fork to return 0 in the child.
   np->trapframe->a0 = 0;
