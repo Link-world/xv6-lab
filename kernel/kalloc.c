@@ -29,7 +29,7 @@ kinit()
   int i;
   for(i = 0; i < NCPU; i++)
   {
-    initlock(&kmem.lock[i], "kmem");
+    initlock(&kmem.lock[i], "kmem");//initialize all locks belonging to cpus
   }
   freerange(end, (void*)PHYSTOP);
 }
@@ -61,12 +61,12 @@ kfree(void *pa)
   r = (struct run*)pa;
   
   push_off();
-  id = cpuid();
+  id = cpuid();//get the id of current cpu
   pop_off();
 
   acquire(&kmem.lock[id]);
   r->next = kmem.freelist[id];
-  kmem.freelist[id] = r;
+  kmem.freelist[id] = r;//generate freelist[id]
   release(&kmem.lock[id]);
 }
 
@@ -80,7 +80,7 @@ kalloc(void)
 
   int i, id, newid;
   push_off();
-  id = cpuid();
+  id = cpuid();//get the id of current cpu
   pop_off();
 
   acquire(&kmem.lock[id]);
@@ -96,13 +96,13 @@ kalloc(void)
     newid = id;
     for(i = 1; i < NCPU; i++)
     {
-      newid = (id + i) % NCPU;
+      newid = (id + i) % NCPU;//iterate from the cpu after the current cpu 
       acquire(&kmem.lock[newid]);
       r = kmem.freelist[newid];
       if(r)
       {
         kmem.freelist[newid] = r->next;
-        release(&kmem.lock[newid]);
+        release(&kmem.lock[newid]);//generate freelist[newid]
         break;
       }
       else
